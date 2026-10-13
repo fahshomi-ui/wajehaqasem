@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#eefaff" />
+    <title>لوحة التحكم - رابط الأزرار</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .selection-panel.admin-panel { min-height: 0; padding-bottom: 56px; }
+      .admin-form { margin-top: 40px; display: grid; gap: 22px; text-align: right; }
+      .field { display: grid; gap: 8px; }
+      .field-label { color: #183e4d; font-size: 17px; font-weight: 700; }
+      .input {
+        width: 100%;
+        min-height: 56px;
+        padding: 12px 16px;
+        border: 1px solid #dfe5e8;
+        border-radius: 16px;
+        background: #fbfdfe;
+        color: #183e4d;
+        font: inherit;
+        font-size: 16px;
+        direction: ltr;
+        text-align: left;
+        transition: border-color .2s ease, box-shadow .2s ease;
+      }
+      .input::placeholder { color: #a7afb3; }
+      .input:focus { outline: none; border-color: #117e9f; box-shadow: 0 0 0 4px rgba(17, 126, 159, .12); background: #fff; }
+      .input.is-invalid { border-color: #d0453a; box-shadow: 0 0 0 4px rgba(208, 69, 58, .1); }
+      .input--password { direction: rtl; text-align: right; }
+      .field-hint { margin: 0; color: #858b8d; font-size: 13px; font-weight: 500; line-height: 1.8; }
+      .applies-to { display: flex; flex-wrap: wrap; gap: 8px; }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: #effaff;
+        color: #117e9f;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .actions { display: grid; gap: 12px; margin-top: 4px; }
+      .primary-btn {
+        min-height: 56px;
+        border: 0;
+        border-radius: 16px;
+        color: #fff;
+        background: linear-gradient(145deg, #198faf, #087198);
+        box-shadow: 0 8px 18px rgba(15, 130, 161, .2);
+        font: inherit;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+      }
+      .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(15, 130, 161, .25); }
+      .primary-btn:disabled { opacity: .6; cursor: wait; transform: none; }
+      .secondary-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .secondary-row a, .text-btn { color: #117e9f; font-size: 14px; font-weight: 700; text-decoration: none; }
+      .text-btn { padding: 0; border: 0; background: none; font-family: inherit; cursor: pointer; }
+      .secondary-row a:hover, .text-btn:hover { text-decoration: underline; }
+      .status { min-height: 26px; margin: 0; font-size: 15px; font-weight: 700; text-align: center; }
+      .status--ok { color: #138a52; }
+      .status--error { color: #c0392b; }
+      .status--info { color: #117e9f; }
+      [hidden] { display: none !important; }
+      @media (max-width: 640px) {
+        .admin-form { margin-top: 30px; gap: 18px; }
+        .field-label { font-size: 15px; }
+        .input { min-height: 50px; font-size: 15px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="selection-panel admin-panel" aria-labelledby="admin-title">
+        <div class="hero-icon" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#117e9f" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <p class="eyebrow">لوحة التحكم</p>
+        <h1 id="admin-title">رابط الأزرار</h1>
+        <p class="intro" id="admin-intro">أدخل كلمة السر للمتابعة</p>
+
+        <!-- Login -->
+        <form class="admin-form" id="login-form" autocomplete="on" novalidate>
+          <label class="field">
+            <span class="field-label">كلمة السر</span>
+            <input class="input input--password" id="password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <div class="actions">
+            <button class="primary-btn" id="login-btn" type="submit">دخول</button>
+            <p class="status" id="login-status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+
+        <!-- Editor -->
+        <form class="admin-form" id="link-form" novalidate hidden>
+          <label class="field">
+            <span class="field-label">الرابط</span>
+            <input class="input" id="link" type="url" inputmode="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" />
+          </label>
+
+          <div class="applies-to" aria-label="يطبّق على">
+            <span class="chip">التأمين ضد الغير</span>
+            <span class="chip">التأمين الشامل</span>
+          </div>
+
+          <p class="field-hint">يُطبّق هذا الرابط على الزرّين معاً ويظهر على الموقع فوراً. اترك الحقل فارغاً لإلغاء الرابط.</p>
+
+          <div class="actions">
+            <button class="primary-btn" id="save-btn" type="submit">حفظ الرابط</button>
+            <p class="status" id="save-status" role="status" aria-live="polite"></p>
+            <div class="secondary-row">
+              <a href="/" target="_blank" rel="noopener">عرض الموقع</a>
+              <button class="text-btn" id="logout-btn" type="button">تسجيل خروج</button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var API = '/api/links';
+        var SESSION_KEY = 'wq_admin_pw';
+
+        var loginForm = document.getElementById('login-form');
+        var linkForm = document.getElementById('link-form');
+        var passwordInput = document.getElementById('password');
+        var linkInput = document.getElementById('link');
+        var loginBtn = document.getElementById('login-btn');
+        var saveBtn = document.getElementById('save-btn');
+        var loginStatus = document.getElementById('login-status');
+        var saveStatus = document.getElementById('save-status');
+        var intro = document.getElementById('admin-intro');
+
+        var ERRORS = {
+          unauthorized: 'كلمة السر غير صحيحة',
+          not_configured: 'لم يتم ضبط كلمة السر بعد. أضف متغير ADMIN_PASSWORD في إعدادات Netlify ثم أعد النشر.',
+          invalid_url: 'الرابط غير صحيح، تأكد أنه يبدأ بـ https://',
+          bad_request: 'طلب غير صالح',
+          network: 'تعذر الاتصال بالخادم، حاول مرة أخرى'
+        };
+
+        function setStatus(el, text, type) {
+          el.textContent = text || '';
+          el.className = 'status' + (type ? ' status--' + type : '');
+        }
+
+        function normalizeUrl(value) {
+          var v = (value || '').trim();
+          if (!v) return '';
+          if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(v)) v = 'https://' + v;
+          return v;
+        }
+
+        function isValidUrl(v) {
+          if (!v) return true;
+          try { var u = new URL(v); return (u.protocol === 'https:' || u.protocol === 'http:') && u.hostname.indexOf('.') > 0; }
+          catch (e) { return false; }
+        }
+
+        function request(password, body) {
+          return fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + password },
+            body: JSON.stringify(body)
+          }).then(function (res) {
+            return res.json().catch(function () { return {}; }).then(function (data) {
+              if (!res.ok) { var err = new Error(data.error || 'network'); err.code = data.error || 'network'; throw err; }
+              return data;
+            });
+          }, function () { var err = new Error('network'); err.code = 'network'; throw err; });
+        }
+
+        function showEditor(link) {
+          linkInput.value = link || '';
+          loginForm.hidden = true;
+          linkForm.hidden = false;
+          intro.textContent = 'حدد الرابط الذي يفتحه زرّا الصفحة الرئيسية';
+          linkInput.focus();
+        }
+
+        function showLogin(message, type) {
+          sessionStorage.removeItem(SESSION_KEY);
+          linkForm.hidden = true;
+          loginForm.hidden = false;
+          intro.textContent = 'أدخل كلمة السر للمتابعة';
+          passwordInput.value = '';
+          setStatus(loginStatus, message, type);
+          passwordInput.focus();
+        }
+
+        function login(password, silent) {
+          loginBtn.disabled = true;
+          if (!silent) setStatus(loginStatus, 'جارٍ التحقق...', 'info');
+          return request(password, { checkOnly: true }).then(function (data) {
+            sessionStorage.setItem(SESSION_KEY, password);
+            setStatus(loginStatus, '');
+            showEditor(data.link);
+          }).catch(function (err) {
+            showLogin(ERRORS[err.code] || ERRORS.network, 'error');
+          }).then(function () { loginBtn.disabled = false; });
+        }
+
+        loginForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var pw = passwordInput.value;
+          if (!pw) { setStatus(loginStatus, 'أدخل كلمة السر', 'error'); return; }
+          login(pw);
+        });
+
+        linkForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var v = normalizeUrl(linkInput.value);
+          linkInput.value = v;
+          if (!isValidUrl(v)) {
+            linkInput.classList.add('is-invalid');
+            setStatus(saveStatus, ERRORS.invalid_url, 'error');
+            linkInput.focus();
+            return;
+          }
+
+          var pw = sessionStorage.getItem(SESSION_KEY);
+          if (!pw) { showLogin('انتهت الجلسة، سجّل دخول من جديد', 'error'); return; }
+
+          saveBtn.disabled = true;
+          setStatus(saveStatus, 'جارٍ الحفظ...', 'info');
+          request(pw, { link: v }).then(function (data) {
+            linkInput.value = data.link || '';
+            setStatus(saveStatus, data.link ? 'تم حفظ الرابط بنجاح' : 'تم الحفظ، الأزرار الآن بدون رابط', 'ok');
+          }).catch(function (err) {
+            if (err.code === 'unauthorized') { showLogin(ERRORS.unauthorized, 'error'); return; }
+            if (err.code === 'invalid_url') linkInput.classList.add('is-invalid');
+            setStatus(saveStatus, ERRORS[err.code] || ERRORS.network, 'error');
+          }).then(function () { saveBtn.disabled = false; });
+        });
+
+        linkInput.addEventListener('input', function () {
+          linkInput.classList.remove('is-invalid');
+          setStatus(saveStatus, '');
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function () {
+          showLogin('تم تسجيل الخروج', 'info');
+        });
+
+        var saved = sessionStorage.getItem(SESSION_KEY);
+        if (saved) login(saved, true); else passwordInput.focus();
+      })();
+    </script>
+  </body>
+</html>

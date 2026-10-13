@@ -1,32 +1,41 @@
 # اختر نوع التأمين
 
-صفحة ثابتة (HTML + CSS) لاختيار نوع تأمين السيارة: **التأمين ضد الغير** أو **التأمين الشامل**.
+صفحة لاختيار نوع تأمين السيارة (**التأمين ضد الغير** و**التأمين الشامل**)، مع **لوحة تحكم** على `/admin` لتغيير رابط الزرّين من مكان واحد بدون تعديل الكود أو إعادة النشر.
 
 ## الملفات
 
 | الملف | الوصف |
 | --- | --- |
-| `index.html` | الصفحة الرئيسية |
-| `styles.css` | التنسيقات (خط Cairo، تصميم متجاوب) |
-| `shield.svg` | أيقونة الدرع |
-| `favicon.svg` | أيقونة المتصفح |
+| `public/index.html` | الصفحة الرئيسية |
+| `public/styles.css` | التنسيقات (خط Cairo، تصميم متجاوب) |
+| `public/app.js` | يقرأ الرابط المحفوظ ويطبّقه على الزرّين |
+| `public/admin/index.html` | لوحة التحكم (محمية بكلمة سر) |
+| `netlify/functions/links.mjs` | دالة Netlify لقراءة وحفظ الرابط (`/api/links`) باستخدام Netlify Blobs |
 | `netlify.toml` | إعدادات النشر على Netlify |
 
 ## النشر على Netlify
 
-1. من لوحة Netlify اختر **Add new site → Import an existing project**.
-2. اربط حساب GitHub واختر المستودع `wajehaqasem`.
-3. اترك **Build command** فارغاً، و **Publish directory** = `.`
+1. من Netlify اختر **Add new site → Import an existing project → GitHub** واختر هذا المستودع.
+2. الإعدادات تُقرأ تلقائياً من `netlify.toml` (لا حاجة لـ Build command، و Publish directory = `public`).
+3. أضف متغير البيئة **`ADMIN_PASSWORD`** (كلمة سر لوحة التحكم):
+   - إما أثناء الإعداد من زر **Add environment variables**،
+   - أو بعد النشر من **Site configuration → Environment variables → Add a variable**، ثم **Deploys → Trigger deploy → Deploy site** حتى يتم تفعيلها.
 4. اضغط **Deploy**.
+
+## تغيير رابط الأزرار
+
+1. افتح `https://اسم-موقعك.netlify.app/admin`
+2. أدخل كلمة السر (قيمة `ADMIN_PASSWORD`).
+3. اكتب الرابط واضغط **حفظ الرابط** — يتغيّر رابط الزرّين فوراً.
+4. لإلغاء الرابط اترك الحقل فارغاً واحفظ (الأزرار لن تفتح أي شيء).
+
+لتغيير كلمة السر: عدّل قيمة `ADMIN_PASSWORD` في Netlify ثم أعد النشر.
 
 ## التشغيل محلياً
 
 ```bash
-python3 -m http.server 8080
+npm install
+ADMIN_PASSWORD=test netlify dev
 ```
 
-ثم افتح `http://localhost:8080`.
-
-## الأزرار
-
-الخياران حالياً أزرار (`<button>`) بدون أي رابط. لإضافة رابط لاحقاً، حوّل الزر إلى `<a class="choice" href="...">` داخل `index.html`.
+ثم افتح `http://localhost:8888` و `http://localhost:8888/admin`.

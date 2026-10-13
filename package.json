@@ -1,0 +1,9 @@
+{
+  "name": "wajehaqasem",
+  "private": true,
+  "type": "module",
+  "description": "Insurance type selection page with an admin panel to edit button links (Netlify Functions + Blobs).",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.4"
+  }
+}

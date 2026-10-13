@@ -1,6 +1,8 @@
-# Static site — no build step required.
+# Static site in /public + one Netlify Function (netlify/functions/links.mjs).
+# Required environment variable on Netlify: ADMIN_PASSWORD (password for /admin).
 [build]
-  publish = "."
+  publish = "public"
+  functions = "netlify/functions"
   command = ""
 
 [[headers]]
@@ -8,6 +10,13 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Frame-Options = "DENY"
+    Cache-Control = "no-store"
 
 [[headers]]
   for = "/*.svg"
