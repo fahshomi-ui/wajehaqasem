@@ -75,6 +75,7 @@ h1 {
 }
 
 .choice {
+  width: 100%;
   min-height: 117px;
   padding: 20px 18px 20px 34px;
   display: flex;
@@ -84,6 +85,10 @@ h1 {
   border-radius: 22px;
   color: inherit;
   background: #fff;
+  font: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
   text-decoration: none;
   text-align: right;
   box-shadow: 0 4px 12px rgba(20, 51, 69, .025);
