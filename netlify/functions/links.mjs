@@ -1,6 +1,14 @@
 import { getStore } from "@netlify/blobs";
+import { createHash } from "node:crypto";
 
 // One link shared by both buttons on the home page.
+
+// Default admin password, stored as a SHA-256 hash (current password: chosen by the site owner).
+// To use a different password without editing code, set ADMIN_PASSWORD in Netlify
+// (Project configuration → Environment variables) — it takes priority over this default.
+const DEFAULT_PASSWORD_SHA256 = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
+
+const sha256 = (value) => createHash("sha256").update(String(value), "utf8").digest("hex");
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -35,6 +43,12 @@ const safeEqual = (a, b) => {
 const getAdminPassword = () =>
   (globalThis.Netlify?.env?.get?.("ADMIN_PASSWORD") ?? process.env.ADMIN_PASSWORD ?? "").trim();
 
+const isPasswordCorrect = (given) => {
+  const fromEnv = getAdminPassword();
+  if (fromEnv) return safeEqual(given, fromEnv);
+  return safeEqual(sha256(given), DEFAULT_PASSWORD_SHA256);
+};
+
 const readLink = async (store) => {
   const saved = (await store.get("settings", { type: "json" })) || {};
   return typeof saved.link === "string" ? saved.link : "";
@@ -48,12 +62,9 @@ export default async (req) => {
   }
 
   if (req.method === "POST") {
-    const expected = getAdminPassword();
-    if (!expected) return json({ error: "not_configured" }, 503);
-
     const auth = req.headers.get("authorization") || "";
     const given = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-    if (!safeEqual(given, expected)) {
+    if (!given || !isPasswordCorrect(given)) {
       await new Promise((r) => setTimeout(r, 800)); // slow down guessing
       return json({ error: "unauthorized" }, 401);
     }

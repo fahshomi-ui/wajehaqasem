@@ -17,15 +17,14 @@
 
 1. من Netlify اختر **Add new site → Import an existing project → GitHub** واختر هذا المستودع.
 2. الإعدادات تُقرأ تلقائياً من `netlify.toml` (لا حاجة لـ Build command، و Publish directory = `public`).
-3. أضف متغير البيئة **`ADMIN_PASSWORD`** (كلمة سر لوحة التحكم):
-   - إما أثناء الإعداد من زر **Add environment variables**،
-   - أو بعد النشر من **Site configuration → Environment variables → Add a variable**، ثم **Deploys → Trigger deploy → Deploy site** حتى يتم تفعيلها.
+3. كلمة سر لوحة التحكم الافتراضية مضبوطة داخل الكود (`netlify/functions/links.mjs`).
+   لتغييرها بدون تعديل الكود أضف متغير البيئة **`ADMIN_PASSWORD`** من **Environment variables → Add a variable**، ثم **Deploys → Trigger deploy** — قيمته تأخذ الأولوية على الافتراضية.
 4. اضغط **Deploy**.
 
 ## تغيير رابط الأزرار
 
 1. افتح `https://اسم-موقعك.netlify.app/admin`
-2. أدخل كلمة السر (قيمة `ADMIN_PASSWORD`).
+2. أدخل كلمة السر.
 3. اكتب الرابط واضغط **حفظ الرابط** — يتغيّر رابط الزرّين فوراً.
 4. لإلغاء الرابط اترك الحقل فارغاً واحفظ (الأزرار لن تفتح أي شيء).
 
