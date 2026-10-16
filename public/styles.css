@@ -243,6 +243,7 @@ h1 {
   line-height: 1.7;
 }
 .panel-note svg { width: 18px; height: 18px; flex: 0 0 18px; color: var(--brand); }
+.panel-note svg.panel-note-wa { color: #1a9d55; }
 
 /* ---------- Content sections ---------- */
 .section {

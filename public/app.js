@@ -1,26 +1,11 @@
-// Reads the settings saved from /admin:
-//  - one link applied to both insurance choice buttons
-//  - optional contact details (phone, WhatsApp, email) shown in the contact section
+// Both insurance buttons open WhatsApp with a ready message for the chosen type.
+// Default number: 0581092444. Numbers saved from /admin (phone / WhatsApp / email) override the defaults.
 (function () {
+  var DEFAULT_WHATSAPP = '966581092444';
+
   var yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  var settingsPromise = fetch('/api/links', { cache: 'no-store' })
-    .then(function (res) { return res.ok ? res.json() : {}; })
-    .catch(function () { return {}; })
-    .then(function (data) { return data || {}; });
-
-  // ---- Choice buttons ----
-  var buttons = document.querySelectorAll('.choice');
-  buttons.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      settingsPromise.then(function (data) {
-        if (data.link) window.location.href = data.link;
-      });
-    });
-  });
-
-  // ---- Contact details ----
   function digits(value) { return String(value || '').replace(/\D+/g, ''); }
 
   // Saudi numbers: 05XXXXXXXX / 5XXXXXXXX / 9665XXXXXXXX / 009665XXXXXXXX -> 9665XXXXXXXX
@@ -32,28 +17,45 @@
     return d;
   }
 
+  function waLink(number, text) {
+    return 'https://wa.me/' + number + (text ? '?text=' + encodeURIComponent(text) : '');
+  }
+
+  function applyWhatsApp(number) {
+    document.querySelectorAll('.choice[data-wa-text]').forEach(function (el) {
+      el.href = waLink(number, el.getAttribute('data-wa-text'));
+    });
+  }
+
   function fill(name, text, href) {
     var item = document.querySelector('[data-contact="' + name + '"]');
-    if (!item) return;
+    if (!item || !text || !href) return;
     var link = item.querySelector('a');
-    if (!text || !href) { item.hidden = true; return; }
     link.textContent = text;
     link.href = href;
     item.hidden = false;
   }
 
-  settingsPromise.then(function (data) {
-    var c = data.contact || {};
-    var phone = String(c.phone || '').trim();
-    var whatsapp = String(c.whatsapp || '').trim();
-    var email = String(c.email || '').trim();
+  applyWhatsApp(DEFAULT_WHATSAPP);
 
-    var phoneDigits = digits(phone);
-    fill('phone', phone, phoneDigits ? 'tel:' + (phone.charAt(0) === '+' ? '+' : '') + phoneDigits : '');
+  fetch('/api/links', { cache: 'no-store' })
+    .then(function (res) { return res.ok ? res.json() : {}; })
+    .catch(function () { return {}; })
+    .then(function (data) {
+      var c = (data && data.contact) || {};
+      var phone = String(c.phone || '').trim();
+      var whatsapp = String(c.whatsapp || '').trim();
+      var email = String(c.email || '').trim();
 
-    var wa = toInternational(whatsapp);
-    fill('whatsapp', whatsapp, wa ? 'https://wa.me/' + wa : '');
+      var wa = toInternational(whatsapp);
+      if (wa.length >= 8) {
+        applyWhatsApp(wa);
+        fill('whatsapp', whatsapp, waLink(wa));
+      }
 
-    fill('email', email, email ? 'mailto:' + email : '');
-  });
+      var phoneDigits = digits(phone);
+      if (phoneDigits) fill('phone', phone, 'tel:' + (phone.charAt(0) === '+' ? '+' : '') + phoneDigits);
+
+      if (email) fill('email', email, 'mailto:' + email);
+    });
 })();

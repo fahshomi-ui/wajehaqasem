@@ -2,8 +2,9 @@ import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
 // Site settings edited from /admin:
-//  - link: one link shared by both buttons on the home page
-//  - contact: optional phone / WhatsApp / email shown in the "تواصل معنا" section
+//  - contact.whatsapp: number opened by both insurance buttons (site default: 0581092444)
+//  - contact.phone / contact.email: shown in the "تواصل معنا" section
+//  - link: legacy field (buttons used to open one shared link); kept for backward compatibility
 
 // Default admin password, stored as a SHA-256 hash (current password: chosen by the site owner).
 // To use a different password without editing code, set ADMIN_PASSWORD in Netlify
@@ -44,11 +45,17 @@ const isValidEmail = (value) =>
 
 const EMPTY_CONTACT = { phone: "", whatsapp: "", email: "" };
 
+// Arabic-Indic (٠-٩) and Persian (۰-۹) digits -> 0-9
+const latinDigits = (value) =>
+  value
+    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0));
+
 const cleanContact = (raw) => {
   const src = raw && typeof raw === "object" ? raw : {};
   return {
-    phone: typeof src.phone === "string" ? src.phone.trim() : "",
-    whatsapp: typeof src.whatsapp === "string" ? src.whatsapp.trim() : "",
+    phone: typeof src.phone === "string" ? latinDigits(src.phone).trim() : "",
+    whatsapp: typeof src.whatsapp === "string" ? latinDigits(src.whatsapp).trim() : "",
     email: typeof src.email === "string" ? src.email.trim() : "",
   };
 };
@@ -106,14 +113,15 @@ export default async (req) => {
     // Used by the admin login screen to verify the password.
     if (body && body.checkOnly) return json({ ok: true, ...(await readSettings(store)) });
 
-    const link = String(body?.link ?? "").trim();
+    const saved = await readSettings(store);
+
+    // If a field isn't sent, keep the saved value.
+    const link = body && body.link !== undefined ? String(body.link ?? "").trim() : saved.link;
     if (link.length > 2048 || !isValidUrl(link)) {
       return json({ error: "invalid_url" }, 400);
     }
 
-    // If the request doesn't include contact details, keep the saved ones.
-    const contact =
-      body && body.contact !== undefined ? cleanContact(body.contact) : (await readSettings(store)).contact;
+    const contact = body && body.contact !== undefined ? cleanContact(body.contact) : saved.contact;
     if (!isValidPhone(contact.phone)) return json({ error: "invalid_phone" }, 400);
     if (!isValidPhone(contact.whatsapp)) return json({ error: "invalid_whatsapp" }, 400);
     if (!isValidEmail(contact.email)) return json({ error: "invalid_email" }, 400);

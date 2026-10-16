@@ -98,7 +98,7 @@
     <main class="page">
       <section class="selection-panel admin-panel" aria-labelledby="admin-title">
         <div class="hero-icon" aria-hidden="true">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#117e9f" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#117e9f" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5 5 16.3A8.5 8.5 0 1 1 8 19.2l-4.5 1.3Z"/><path d="M9.2 8.6c.2-.5.5-.6.8-.6h.5c.2 0 .4.1.5.4l.6 1.5c.1.2 0 .5-.1.6l-.5.6c.6 1.2 1.6 2.1 2.8 2.7l.6-.6c.2-.2.4-.2.6-.1l1.5.7c.3.1.4.3.4.5v.5c0 .4-.2.7-.6.9-.7.3-1.6.4-2.6 0a8 8 0 0 1-4.3-4.3c-.4-1-.4-2 0-2.8Z"/></svg>
         </div>
         <p class="eyebrow">لوحة التحكم · مكتب الوسيم للخدمات العامة</p>
         <h1 id="admin-title">إعدادات الموقع</h1>
@@ -118,33 +118,30 @@
 
         <!-- Editor -->
         <form class="admin-form" id="link-form" novalidate hidden>
-          <label class="field">
-            <span class="field-label">الرابط</span>
-            <input class="input" id="link" type="url" inputmode="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" />
-          </label>
-
-          <div class="applies-to" aria-label="يطبّق على">
-            <span class="chip">التأمين ضد الغير</span>
-            <span class="chip">التأمين الشامل</span>
-          </div>
-
-          <p class="field-hint">يُطبّق هذا الرابط على الزرّين معاً ويظهر على الموقع فوراً. اترك الحقل فارغاً لإلغاء الرابط.</p>
+          <fieldset class="group">
+            <legend>زرّا التأمين (واتساب)</legend>
+            <label class="field">
+              <span class="field-label">رقم واتساب</span>
+              <input class="input" id="whatsapp" type="tel" inputmode="tel" placeholder="0581092444" autocomplete="off" spellcheck="false" />
+            </label>
+            <div class="applies-to" aria-label="يطبّق على">
+              <span class="chip">التأمين ضد الغير</span>
+              <span class="chip">التأمين الشامل</span>
+            </div>
+            <p class="field-hint">يفتح زرّا الصفحة الرئيسية محادثة واتساب على هذا الرقم مع رسالة جاهزة بنوع التأمين المختار، ويظهر الرقم في قسم «تواصل معنا». اتركه فارغاً لاستخدام الرقم الافتراضي 0581092444.</p>
+          </fieldset>
 
           <fieldset class="group">
             <legend>معلومات التواصل</legend>
             <label class="field">
               <span class="field-label">رقم الهاتف</span>
-              <input class="input" id="phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX" autocomplete="off" spellcheck="false" />
-            </label>
-            <label class="field">
-              <span class="field-label">رقم واتساب</span>
-              <input class="input" id="whatsapp" type="tel" inputmode="tel" placeholder="05XXXXXXXX" autocomplete="off" spellcheck="false" />
+              <input class="input" id="phone" type="tel" inputmode="tel" placeholder="0581092444" autocomplete="off" spellcheck="false" />
             </label>
             <label class="field">
               <span class="field-label">البريد الإلكتروني</span>
               <input class="input" id="email" type="email" inputmode="email" placeholder="info@example.com" autocomplete="off" spellcheck="false" />
             </label>
-            <p class="field-hint">تظهر هذه البيانات في قسم «تواصل معنا» بالصفحة الرئيسية. أي حقل يُترك فارغاً لن يظهر في الموقع.</p>
+            <p class="field-hint">تظهر في قسم «تواصل معنا». إذا تُرك الهاتف فارغاً يظهر الرقم الافتراضي 0581092444، وإذا تُرك البريد فارغاً لا يظهر.</p>
           </fieldset>
 
           <div class="actions">
@@ -167,7 +164,6 @@
         var loginForm = document.getElementById('login-form');
         var linkForm = document.getElementById('link-form');
         var passwordInput = document.getElementById('password');
-        var linkInput = document.getElementById('link');
         var phoneInput = document.getElementById('phone');
         var whatsappInput = document.getElementById('whatsapp');
         var emailInput = document.getElementById('email');
@@ -180,7 +176,6 @@
         var ERRORS = {
           unauthorized: 'كلمة السر غير صحيحة',
           not_configured: 'لم يتم ضبط كلمة السر بعد. أضف متغير ADMIN_PASSWORD في إعدادات Netlify ثم أعد النشر.',
-          invalid_url: 'الرابط غير صحيح، تأكد أنه يبدأ بـ https://',
           invalid_phone: 'رقم الهاتف غير صحيح',
           invalid_whatsapp: 'رقم واتساب غير صحيح',
           invalid_email: 'البريد الإلكتروني غير صحيح',
@@ -191,19 +186,6 @@
         function setStatus(el, text, type) {
           el.textContent = text || '';
           el.className = 'status' + (type ? ' status--' + type : '');
-        }
-
-        function normalizeUrl(value) {
-          var v = (value || '').trim();
-          if (!v) return '';
-          if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(v)) v = 'https://' + v;
-          return v;
-        }
-
-        function isValidUrl(v) {
-          if (!v) return true;
-          try { var u = new URL(v); return (u.protocol === 'https:' || u.protocol === 'http:') && u.hostname.indexOf('.') > 0; }
-          catch (e) { return false; }
         }
 
         function isValidPhone(v) {
@@ -223,7 +205,7 @@
             .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); }).trim();
         }
 
-        var FIELD_FOR_ERROR = { invalid_url: linkInput, invalid_phone: phoneInput, invalid_whatsapp: whatsappInput, invalid_email: emailInput };
+        var FIELD_FOR_ERROR = { invalid_phone: phoneInput, invalid_whatsapp: whatsappInput, invalid_email: emailInput };
 
         function request(password, body) {
           return fetch(API, {
@@ -240,14 +222,13 @@
 
         function showEditor(data) {
           var c = (data && data.contact) || {};
-          linkInput.value = (data && data.link) || '';
           phoneInput.value = c.phone || '';
           whatsappInput.value = c.whatsapp || '';
           emailInput.value = c.email || '';
           loginForm.hidden = true;
           linkForm.hidden = false;
-          intro.textContent = 'حدد رابط زرّي الصفحة الرئيسية ومعلومات التواصل';
-          linkInput.focus();
+          intro.textContent = 'حدد رقم واتساب لزرّي التأمين ومعلومات التواصل';
+          whatsappInput.focus();
         }
 
         function showLogin(message, type) {
@@ -281,8 +262,6 @@
 
         linkForm.addEventListener('submit', function (e) {
           e.preventDefault();
-          var v = normalizeUrl(linkInput.value);
-          linkInput.value = v;
           var contact = {
             phone: latinDigits(phoneInput.value),
             whatsapp: latinDigits(whatsappInput.value),
@@ -292,8 +271,7 @@
           whatsappInput.value = contact.whatsapp;
           emailInput.value = contact.email;
 
-          var problem = !isValidUrl(v) ? 'invalid_url'
-            : !isValidPhone(contact.phone) ? 'invalid_phone'
+          var problem = !isValidPhone(contact.phone) ? 'invalid_phone'
             : !isValidPhone(contact.whatsapp) ? 'invalid_whatsapp'
             : !isValidEmail(contact.email) ? 'invalid_email' : '';
           if (problem) {
@@ -308,9 +286,8 @@
 
           saveBtn.disabled = true;
           setStatus(saveStatus, 'جارٍ الحفظ...', 'info');
-          request(pw, { link: v, contact: contact }).then(function (data) {
-            linkInput.value = data.link || '';
-            setStatus(saveStatus, data.link ? 'تم حفظ الإعدادات بنجاح' : 'تم الحفظ، الأزرار الآن بدون رابط', 'ok');
+          request(pw, { contact: contact }).then(function () {
+            setStatus(saveStatus, 'تم حفظ الإعدادات بنجاح', 'ok');
           }).catch(function (err) {
             if (err.code === 'unauthorized') { showLogin(ERRORS.unauthorized, 'error'); return; }
             if (FIELD_FOR_ERROR[err.code]) FIELD_FOR_ERROR[err.code].classList.add('is-invalid');
@@ -318,7 +295,7 @@
           }).then(function () { saveBtn.disabled = false; });
         });
 
-        [linkInput, phoneInput, whatsappInput, emailInput].forEach(function (input) {
+        [phoneInput, whatsappInput, emailInput].forEach(function (input) {
           input.addEventListener('input', function () {
             input.classList.remove('is-invalid');
             setStatus(saveStatus, '');
