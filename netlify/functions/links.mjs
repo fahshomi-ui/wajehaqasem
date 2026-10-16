@@ -1,7 +1,10 @@
 import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
-// One link shared by both buttons on the home page.
+// Site settings edited from /admin:
+//  - contact.whatsapp: number opened by both insurance buttons (site default: 0581092444)
+//  - contact.phone / contact.email: shown in the "تواصل معنا" section
+//  - link: legacy field (buttons used to open one shared link); kept for backward compatibility
 
 // Default admin password, stored as a SHA-256 hash (current password: chosen by the site owner).
 // To use a different password without editing code, set ADMIN_PASSWORD in Netlify
@@ -29,6 +32,34 @@ const isValidUrl = (value) => {
   }
 };
 
+// Phone-like value: digits with optional +, spaces, dashes, brackets (5–15 digits). Empty = hidden.
+const isValidPhone = (value) => {
+  if (value === "") return true;
+  if (value.length > 25 || !/^[+\d\s\-()]+$/.test(value)) return false;
+  const count = value.replace(/\D+/g, "").length;
+  return count >= 5 && count <= 15;
+};
+
+const isValidEmail = (value) =>
+  value === "" || (value.length <= 254 && /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(value));
+
+const EMPTY_CONTACT = { phone: "", whatsapp: "", email: "" };
+
+// Arabic-Indic (٠-٩) and Persian (۰-۹) digits -> 0-9
+const latinDigits = (value) =>
+  value
+    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0));
+
+const cleanContact = (raw) => {
+  const src = raw && typeof raw === "object" ? raw : {};
+  return {
+    phone: typeof src.phone === "string" ? latinDigits(src.phone).trim() : "",
+    whatsapp: typeof src.whatsapp === "string" ? latinDigits(src.whatsapp).trim() : "",
+    email: typeof src.email === "string" ? src.email.trim() : "",
+  };
+};
+
 // Constant-time string comparison to avoid leaking the password via timing.
 const safeEqual = (a, b) => {
   const enc = new TextEncoder();
@@ -49,16 +80,19 @@ const isPasswordCorrect = (given) => {
   return safeEqual(sha256(given), DEFAULT_PASSWORD_SHA256);
 };
 
-const readLink = async (store) => {
+const readSettings = async (store) => {
   const saved = (await store.get("settings", { type: "json" })) || {};
-  return typeof saved.link === "string" ? saved.link : "";
+  return {
+    link: typeof saved.link === "string" ? saved.link : "",
+    contact: { ...EMPTY_CONTACT, ...cleanContact(saved.contact) },
+  };
 };
 
 export default async (req) => {
   const store = getStore({ name: "site-settings", consistency: "strong" });
 
   if (req.method === "GET") {
-    return json({ link: await readLink(store) });
+    return json(await readSettings(store));
   }
 
   if (req.method === "POST") {
@@ -77,15 +111,23 @@ export default async (req) => {
     }
 
     // Used by the admin login screen to verify the password.
-    if (body && body.checkOnly) return json({ ok: true, link: await readLink(store) });
+    if (body && body.checkOnly) return json({ ok: true, ...(await readSettings(store)) });
 
-    const link = String(body?.link ?? "").trim();
+    const saved = await readSettings(store);
+
+    // If a field isn't sent, keep the saved value.
+    const link = body && body.link !== undefined ? String(body.link ?? "").trim() : saved.link;
     if (link.length > 2048 || !isValidUrl(link)) {
       return json({ error: "invalid_url" }, 400);
     }
 
-    await store.setJSON("settings", { link, updatedAt: new Date().toISOString() });
-    return json({ ok: true, link });
+    const contact = body && body.contact !== undefined ? cleanContact(body.contact) : saved.contact;
+    if (!isValidPhone(contact.phone)) return json({ error: "invalid_phone" }, 400);
+    if (!isValidPhone(contact.whatsapp)) return json({ error: "invalid_whatsapp" }, 400);
+    if (!isValidEmail(contact.email)) return json({ error: "invalid_email" }, 400);
+
+    await store.setJSON("settings", { link, contact, updatedAt: new Date().toISOString() });
+    return json({ ok: true, link, contact });
   }
 
   return json({ error: "method_not_allowed" }, 405);
