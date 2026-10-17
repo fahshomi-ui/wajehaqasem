@@ -121,6 +121,7 @@ p { line-height: 1.95; }
 .footer-top > p { font-size: 11px; color: var(--muted); margin: 0; }
 .footer-top > div { display: grid; gap: 7px; font-size: 11px; color: var(--muted); }
 .footer-top > div a[dir="ltr"] { justify-self: start; }
+.footer-top .footer-address { line-height: 1.9; }
 .footer-bottom { display: flex; gap: 20px; border-top: 1px solid var(--line); padding-block: 21px; font-size: 10px; color: var(--muted); }
 .footer-bottom > span { margin-inline-end: auto; }
 dialog { width: min(540px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 9px; background: var(--cream); padding: 39px; color: var(--ink); max-height: 85svh; }
