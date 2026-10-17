@@ -2,7 +2,7 @@
   "name": "wajehaqasem",
   "private": true,
   "type": "module",
-  "description": "Website of Al-Waseem Office for General Services (مكتب الوسيم للخدمات العامة): insurance type selection, contact info and an admin panel (Netlify Functions + Blobs).",
+  "description": "Website of Al-Waseem Office for General Services (مكتب الوسيم للخدمات العامة): general services and transaction follow-up (same design as amncar.com), WhatsApp contact and an admin panel (Netlify Functions + Blobs).",
   "dependencies": {
     "@netlify/blobs": "^11.1.4"
   }
