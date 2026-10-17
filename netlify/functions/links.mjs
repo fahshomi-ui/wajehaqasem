@@ -2,7 +2,7 @@ import { getStore } from "@netlify/blobs";
 import { createHash } from "node:crypto";
 
 // Site settings edited from /admin:
-//  - contact.whatsapp: number opened by both insurance buttons (site default: 0581092444)
+//  - contact.whatsapp: number opened by all WhatsApp buttons and the request form (site default: 0581092444)
 //  - contact.phone / contact.email: shown in the "تواصل معنا" section
 //  - link: legacy field (buttons used to open one shared link); kept for backward compatibility
 
