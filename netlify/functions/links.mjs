@@ -3,7 +3,8 @@ import { createHash } from "node:crypto";
 
 // Site settings edited from /admin:
 //  - contact.whatsapp: number opened by all WhatsApp buttons and the request form (site default: 0581092444)
-//  - contact.phone / contact.email: shown in the "تواصل معنا" section
+//  - contact.phone / contact.phone2: the two call numbers shown on the site (defaults: 0581092444 / 0581092488)
+//  - contact.email: shown in the footer
 //  - link: legacy field (buttons used to open one shared link); kept for backward compatibility
 
 // Default admin password, stored as a SHA-256 hash (current password: chosen by the site owner).
@@ -43,7 +44,7 @@ const isValidPhone = (value) => {
 const isValidEmail = (value) =>
   value === "" || (value.length <= 254 && /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(value));
 
-const EMPTY_CONTACT = { phone: "", whatsapp: "", email: "" };
+const EMPTY_CONTACT = { phone: "", phone2: "", whatsapp: "", email: "" };
 
 // Arabic-Indic (٠-٩) and Persian (۰-۹) digits -> 0-9
 const latinDigits = (value) =>
@@ -55,6 +56,7 @@ const cleanContact = (raw) => {
   const src = raw && typeof raw === "object" ? raw : {};
   return {
     phone: typeof src.phone === "string" ? latinDigits(src.phone).trim() : "",
+    phone2: typeof src.phone2 === "string" ? latinDigits(src.phone2).trim() : "",
     whatsapp: typeof src.whatsapp === "string" ? latinDigits(src.whatsapp).trim() : "",
     email: typeof src.email === "string" ? src.email.trim() : "",
   };
@@ -123,6 +125,7 @@ export default async (req) => {
 
     const contact = body && body.contact !== undefined ? cleanContact(body.contact) : saved.contact;
     if (!isValidPhone(contact.phone)) return json({ error: "invalid_phone" }, 400);
+    if (!isValidPhone(contact.phone2)) return json({ error: "invalid_phone2" }, 400);
     if (!isValidPhone(contact.whatsapp)) return json({ error: "invalid_whatsapp" }, 400);
     if (!isValidEmail(contact.email)) return json({ error: "invalid_email" }, 400);
 

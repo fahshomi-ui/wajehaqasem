@@ -103,14 +103,18 @@
           <fieldset class="group">
             <legend>معلومات التواصل</legend>
             <label class="field">
-              <span class="field-label">رقم الهاتف (الاتصال)</span>
+              <span class="field-label">رقم الهاتف الأول</span>
               <input class="input" id="phone" type="tel" inputmode="tel" placeholder="0581092444" autocomplete="off" spellcheck="false" />
+            </label>
+            <label class="field">
+              <span class="field-label">رقم الهاتف الثاني</span>
+              <input class="input" id="phone2" type="tel" inputmode="tel" placeholder="0581092488" autocomplete="off" spellcheck="false" />
             </label>
             <label class="field">
               <span class="field-label">البريد الإلكتروني</span>
               <input class="input" id="email" type="email" inputmode="email" placeholder="info@example.com" autocomplete="off" spellcheck="false" />
             </label>
-            <p class="field-hint">رقم الهاتف يظهر في زر «تواصل معنا» أعلى الصفحة، وفي قسم «ما الخدمة التي تحتاجها؟»، والأسئلة الشائعة، وأسفل الموقع. إذا تُرك فارغاً يظهر الرقم الافتراضي 0581092444. البريد يظهر أسفل الموقع، ولا يظهر إذا تُرك فارغاً.</p>
+            <p class="field-hint">يظهر الرقمان معاً في قسم «ما الخدمة التي تحتاجها؟»، والأسئلة الشائعة، وأسفل الموقع، ويتصل زر «تواصل معنا» أعلى الصفحة بالرقم الأول. إذا تُرك أي رقم فارغاً يظهر رقمه الافتراضي (الأول 0581092444، الثاني 0581092488). البريد يظهر أسفل الموقع، ولا يظهر إذا تُرك فارغاً.</p>
           </fieldset>
 
           <div class="actions">
@@ -134,6 +138,7 @@
         var linkForm = document.getElementById('link-form');
         var passwordInput = document.getElementById('password');
         var phoneInput = document.getElementById('phone');
+        var phone2Input = document.getElementById('phone2');
         var whatsappInput = document.getElementById('whatsapp');
         var emailInput = document.getElementById('email');
         var loginBtn = document.getElementById('login-btn');
@@ -145,7 +150,8 @@
         var ERRORS = {
           unauthorized: 'كلمة السر غير صحيحة',
           not_configured: 'لم يتم ضبط كلمة السر بعد. أضف متغير ADMIN_PASSWORD في إعدادات الموقع ثم أعد النشر.',
-          invalid_phone: 'رقم الهاتف غير صحيح',
+          invalid_phone: 'رقم الهاتف الأول غير صحيح',
+          invalid_phone2: 'رقم الهاتف الثاني غير صحيح',
           invalid_whatsapp: 'رقم واتساب غير صحيح',
           invalid_email: 'البريد الإلكتروني غير صحيح',
           bad_request: 'طلب غير صالح',
@@ -174,7 +180,7 @@
             .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); }).trim();
         }
 
-        var FIELD_FOR_ERROR = { invalid_phone: phoneInput, invalid_whatsapp: whatsappInput, invalid_email: emailInput };
+        var FIELD_FOR_ERROR = { invalid_phone: phoneInput, invalid_phone2: phone2Input, invalid_whatsapp: whatsappInput, invalid_email: emailInput };
 
         function request(password, body) {
           return fetch(API, {
@@ -192,11 +198,12 @@
         function showEditor(data) {
           var c = (data && data.contact) || {};
           phoneInput.value = c.phone || '';
+          phone2Input.value = c.phone2 || '';
           whatsappInput.value = c.whatsapp || '';
           emailInput.value = c.email || '';
           loginForm.hidden = true;
           linkForm.hidden = false;
-          intro.textContent = 'حدد رقم واتساب ورقم الهاتف والبريد الظاهرة في الموقع';
+          intro.textContent = 'حدد رقم واتساب ورقمي الهاتف والبريد الظاهرة في الموقع';
           whatsappInput.focus();
         }
 
@@ -233,14 +240,17 @@
           e.preventDefault();
           var contact = {
             phone: latinDigits(phoneInput.value),
+            phone2: latinDigits(phone2Input.value),
             whatsapp: latinDigits(whatsappInput.value),
             email: emailInput.value.trim()
           };
           phoneInput.value = contact.phone;
+          phone2Input.value = contact.phone2;
           whatsappInput.value = contact.whatsapp;
           emailInput.value = contact.email;
 
           var problem = !isValidPhone(contact.phone) ? 'invalid_phone'
+            : !isValidPhone(contact.phone2) ? 'invalid_phone2'
             : !isValidPhone(contact.whatsapp) ? 'invalid_whatsapp'
             : !isValidEmail(contact.email) ? 'invalid_email' : '';
           if (problem) {
@@ -264,7 +274,7 @@
           }).then(function () { saveBtn.disabled = false; });
         });
 
-        [phoneInput, whatsappInput, emailInput].forEach(function (input) {
+        [phoneInput, phone2Input, whatsappInput, emailInput].forEach(function (input) {
           input.addEventListener('input', function () {
             input.classList.remove('is-invalid');
             setStatus(saveStatus, '');

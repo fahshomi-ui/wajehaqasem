@@ -65,12 +65,17 @@ function applyContact(contact) {
       link.href = `${whatsappBase}${query}`;
     }
   }
-  const phone = toInternational(contact.phone);
-  if (phone.length >= 8) {
+  // Two call numbers: data-phone="1" (contact.phone, default 0581092444) and data-phone="2" (contact.phone2, default 0581092488).
+  const phones = { 1: toInternational(contact.phone), 2: toInternational(contact.phone2) };
+  for (const slot of ['1', '2']) {
+    const phone = phones[slot];
+    if (phone.length < 8) continue;
     const local = toLocal(phone);
-    for (const link of document.querySelectorAll('a[href^="tel:"]')) link.href = `tel:+${phone}`;
-    for (const el of document.querySelectorAll('[data-phone-text]')) {
-      el.textContent = el.dataset.phoneText === 'spaced' ? spaced(local) : local;
+    for (const link of document.querySelectorAll(`a[href^="tel:"][data-phone="${slot}"]`)) {
+      link.href = `tel:+${phone}`;
+      for (const el of [link, ...link.querySelectorAll('[data-phone-text]')]) {
+        if (el.dataset.phoneText) el.textContent = el.dataset.phoneText === 'spaced' ? spaced(local) : local;
+      }
     }
   }
   const email = String(contact.email || '').trim();

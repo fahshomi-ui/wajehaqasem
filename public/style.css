@@ -92,6 +92,7 @@ p { line-height: 1.95; }
 .request-section { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
 .request-copy > p:not(.eyebrow) { font-size: 14px; color: var(--muted); max-width: 385px; }
 .phone-link { display: inline-flex; align-items: center; gap: 12px; font-size: 23px; font-weight: 700; padding-block: 15px; }
+.phone-links { display: flex; flex-wrap: wrap; column-gap: 30px; }
 .request-copy .privacy-note { margin-top: 16px; font-size: 11px!important; border-right: 2px solid var(--gold); padding-right: 16px; }
 .request-form { background: #fffef9; border: 1px solid var(--line); border-radius: 7px; padding: 32px; }
 .request-form label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
@@ -119,6 +120,7 @@ p { line-height: 1.95; }
 .footer-top { display: flex; justify-content: space-between; gap: 25px; align-items: center; padding-bottom: 35px; }
 .footer-top > p { font-size: 11px; color: var(--muted); margin: 0; }
 .footer-top > div { display: grid; gap: 7px; font-size: 11px; color: var(--muted); }
+.footer-top > div a[dir="ltr"] { justify-self: start; }
 .footer-bottom { display: flex; gap: 20px; border-top: 1px solid var(--line); padding-block: 21px; font-size: 10px; color: var(--muted); }
 .footer-bottom > span { margin-inline-end: auto; }
 dialog { width: min(540px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 9px; background: var(--cream); padding: 39px; color: var(--ink); max-height: 85svh; }
